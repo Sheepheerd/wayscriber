@@ -1,3 +1,8 @@
+# PREFACE
+
+This is edited with claude-ai in-order to add features I want without pushing and having PR for the original maintainer. This is for me and my needs.
+
+
 # wayscriber
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
