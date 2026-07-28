@@ -15,14 +15,16 @@ pub enum PerformanceFieldId {
     EnableVsync,
     MaxFpsNoVsync,
     UiAnimationFps,
+    AnimateImages,
 }
 
 impl PerformanceFieldId {
-    pub const ALL: [Self; 4] = [
+    pub const ALL: [Self; 5] = [
         Self::BufferCount,
         Self::EnableVsync,
         Self::MaxFpsNoVsync,
         Self::UiAnimationFps,
+        Self::AnimateImages,
     ];
 }
 
@@ -132,6 +134,15 @@ pub const PERFORMANCE_FIELD_METADATA: &[PerformanceFieldMetadata] = &[
             min: 0,
             max: PERFORMANCE_UI_ANIMATION_FPS_MAX,
         },
+    },
+    PerformanceFieldMetadata {
+        id: PerformanceFieldId::AnimateImages,
+        path: "performance.animate_images",
+        group: PerformanceFieldGroup::Animations,
+        label: "Play animated images",
+        help: "Plays pasted animated GIFs. Turn off to show their first frame instead, which avoids redrawing the canvas on every animation frame.",
+        search_terms: &["animation", "gif", "animated", "image", "paste", "playback"],
+        constraint: ScalarConstraint::Boolean,
     },
 ];
 

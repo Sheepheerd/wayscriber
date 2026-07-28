@@ -11,6 +11,7 @@ use helpers::{
 };
 
 mod action_bindings;
+mod animated_images;
 mod arrow_labels;
 mod basics;
 mod board_picker;

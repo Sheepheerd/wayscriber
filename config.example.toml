@@ -1293,6 +1293,10 @@ max_fps_no_vsync = 120
 # Higher values smooth UI effects at the cost of more redraws
 ui_animation_fps = 30
 
+# Play pasted animated images (GIFs)
+# false shows the first frame instead, avoiding a canvas redraw per animation frame
+animate_images = true
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # HISTORY / STEP UNDO SETTINGS
 # ═══════════════════════════════════════════════════════════════════════════════

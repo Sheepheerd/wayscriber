@@ -27,5 +27,6 @@ impl ConfigDraft {
         ) {
             config.performance.ui_animation_fps = value;
         }
+        config.performance.animate_images = self.performance_animate_images;
     }
 }

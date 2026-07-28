@@ -8,6 +8,7 @@ mod pressure_strokes;
 mod primitives;
 mod selection;
 mod shapes;
+mod smoothing;
 mod spotlight;
 mod strokes;
 mod text;
@@ -16,6 +17,9 @@ mod types;
 pub use background::{fill_transparent, render_board_background};
 pub use blur::{BlurRectParams, render_blur_rect};
 pub use highlight::render_click_highlight;
+pub use image::{
+    AnimationStatus, animation_playhead, animation_status, is_animatable, set_animation_playhead,
+};
 #[allow(unused_imports)]
 pub use pressure_strokes::render_freehand_pressure_borrowed;
 pub(crate) use pressure_strokes::render_freehand_pressure_preview_borrowed;
@@ -27,7 +31,9 @@ pub use spotlight::{
     spotlight_regions_for_frame,
 };
 pub(crate) use strokes::render_eraser_stroke;
-pub use strokes::{render_freehand_borrowed, render_marker_stroke_borrowed};
+pub use strokes::{
+    marker_glow, render_freehand_borrowed, render_marker_stroke_borrowed, set_marker_glow,
+};
 pub(crate) use text::render_sticky_note_preview;
 pub use text::{
     caret_line_width, caret_outline_width, render_sticky_note, render_text, sticky_note_foreground,

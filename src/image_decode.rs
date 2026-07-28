@@ -1,9 +1,28 @@
 use std::io::Cursor;
 
+pub(crate) mod gif;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum EncodedImageFormat {
     Png,
     Jpeg,
+    Gif,
+}
+
+impl EncodedImageFormat {
+    /// MIME type stored on the shape, regardless of what the source offered.
+    pub(crate) fn canonical_mime_type(self) -> &'static str {
+        match self {
+            Self::Png => "image/png",
+            Self::Jpeg => "image/jpeg",
+            Self::Gif => "image/gif",
+        }
+    }
+
+    /// Whether this format can carry more than one frame.
+    pub(crate) fn is_animatable(self) -> bool {
+        matches!(self, Self::Gif)
+    }
 }
 
 #[derive(Debug)]
@@ -20,6 +39,7 @@ pub(crate) fn format_from_mime_or_bytes(
     match mime_type {
         "image/png" => Some(EncodedImageFormat::Png),
         "image/jpeg" | "image/jpg" => Some(EncodedImageFormat::Jpeg),
+        "image/gif" => Some(EncodedImageFormat::Gif),
         _ => guess_format(bytes),
     }
 }
@@ -32,6 +52,7 @@ pub(crate) fn image_dimensions(
     match format {
         EncodedImageFormat::Png => png_dimensions(bytes),
         EncodedImageFormat::Jpeg => jpeg_dimensions(bytes),
+        EncodedImageFormat::Gif => gif::dimensions(bytes),
     }
 }
 
@@ -42,6 +63,9 @@ pub(crate) fn decode_rgba(
     match format {
         EncodedImageFormat::Png => decode_png_rgba(bytes),
         EncodedImageFormat::Jpeg => decode_jpeg_rgba(bytes),
+        // Still callers (export, validation) get the first frame; playback goes
+        // through `gif::decode_animation`.
+        EncodedImageFormat::Gif => gif::decode_first_frame(bytes),
     }
 }
 
@@ -51,6 +75,9 @@ fn guess_format(bytes: &[u8]) -> Option<EncodedImageFormat> {
     }
     if bytes.starts_with(&[0xff, 0xd8, 0xff]) {
         return Some(EncodedImageFormat::Jpeg);
+    }
+    if bytes.starts_with(b"GIF87a") || bytes.starts_with(b"GIF89a") {
+        return Some(EncodedImageFormat::Gif);
     }
     None
 }

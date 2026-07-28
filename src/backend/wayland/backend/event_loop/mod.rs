@@ -117,8 +117,13 @@ pub(super) fn run_event_loop(
         // Transient toolbar-fade animation shares the animation timeout slot:
         // a fade in flight (or a pending 4s idle dim) wakes the loop, and a
         // settled fade contributes nothing.
+        // Animated images wake the loop exactly when their next frame is due,
+        // so a 10 fps GIF costs 10 wakeups a second rather than a UI-rate tick.
         let animation_timeout = min_timeout(
-            state.ui_animation_timeout(now),
+            min_timeout(
+                state.ui_animation_timeout(now),
+                state.input_state.animated_image_timeout(now),
+            ),
             state.top_strip_fade_timeout(now),
         );
         let toolbar_handoff_timeout = state.toolbar_drag_handoff_timeout(now);
@@ -259,6 +264,14 @@ pub(super) fn run_event_loop(
         state.tick_key_repeat(Instant::now(), conn, qh);
 
         if !capture_active && state.ui_animation_due(std::time::Instant::now()) {
+            state.input_state.needs_redraw = true;
+        }
+
+        if !capture_active
+            && state
+                .input_state
+                .animated_images_due(std::time::Instant::now())
+        {
             state.input_state.needs_redraw = true;
         }
 

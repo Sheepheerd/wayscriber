@@ -63,6 +63,7 @@ pub struct ConfigDraft {
     pub performance_enable_vsync: bool,
     pub performance_max_fps_no_vsync: String,
     pub performance_ui_animation_fps: String,
+    pub performance_animate_images: bool,
 
     pub ui_theme: UiThemeOption,
     pub ui_reduced_motion: ReducedMotionOption,

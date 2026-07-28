@@ -110,6 +110,7 @@ impl ConfigDraft {
             performance_enable_vsync: config.performance.enable_vsync,
             performance_max_fps_no_vsync: config.performance.max_fps_no_vsync.to_string(),
             performance_ui_animation_fps: config.performance.ui_animation_fps.to_string(),
+            performance_animate_images: config.performance.animate_images,
 
             ui_theme: UiThemeOption::from_theme(config.ui.theme),
             ui_reduced_motion: ReducedMotionOption::from_reduced_motion(config.ui.reduced_motion),

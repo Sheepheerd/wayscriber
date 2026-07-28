@@ -6,6 +6,7 @@
 
 ## Architecture
 - `image.rs` and `file_list.rs` build clipboard payloads.
+- `image.rs` ranks `image/gif` above `image/png` so an animated offer is not flattened to a single frame; decoding and playback live in `src/image_decode/gif.rs` and `src/draw/render/image/`.
 - `transfer.rs` owns Wayland clipboard transfer helpers.
 - `system.rs` and `system/command.rs` provide external command fallback behavior.
 

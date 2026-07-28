@@ -2,13 +2,14 @@ use super::{
     ClipboardPasteResult, MAX_CLIPBOARD_IMAGE_PIXELS, WAYSCRIBER_SELECTION_MIME, file_list,
 };
 use crate::draw::EmbeddedImage;
-use crate::image_decode::{
-    EncodedImageFormat, decode_rgba, format_from_mime_or_bytes, image_dimensions,
-};
+use crate::image_decode::{decode_rgba, format_from_mime_or_bytes, image_dimensions};
 
 pub(super) fn choose_supported_mime(offered: &[String]) -> Option<String> {
+    // `image/gif` outranks `image/png`: browsers and chat clients offer both for
+    // an animated GIF, and taking the PNG silently flattens it to one frame.
     if let Some(mime) = [
         WAYSCRIBER_SELECTION_MIME,
+        "image/gif",
         "image/png",
         "image/jpeg",
         "image/jpg",
@@ -47,31 +48,50 @@ pub(super) fn decode_clipboard_image(mime_type: &str, bytes: Vec<u8>) -> Clipboa
         return ClipboardPasteResult::DecodeFailed(err);
     }
     log::info!(
-        "Decoded clipboard image: offered_mime={}, stored_mime={}, dimensions={}x{}, encoded_bytes={}",
+        "Decoded clipboard image: offered_mime={}, stored_mime={}, dimensions={}x{}, encoded_bytes={}, animatable={}",
         mime_type,
-        canonical_image_mime_type(format),
+        format.canonical_mime_type(),
         dimensions.0,
         dimensions.1,
-        encoded_bytes
+        encoded_bytes,
+        format.is_animatable()
     );
     ClipboardPasteResult::Image(EmbeddedImage {
-        mime_type: canonical_image_mime_type(format).to_string(),
+        mime_type: format.canonical_mime_type().to_string(),
         width: dimensions.0,
         height: dimensions.1,
         bytes,
     })
 }
 
-fn canonical_image_mime_type(format: EncodedImageFormat) -> &'static str {
-    match format {
-        EncodedImageFormat::Png => "image/png",
-        EncodedImageFormat::Jpeg => "image/jpeg",
-    }
-}
-
 #[cfg(test)]
 mod tests {
+    use super::choose_supported_mime;
     use crate::backend::wayland::clipboard::MAX_CLIPBOARD_IMAGE_BYTES;
+
+    #[test]
+    fn an_animated_gif_offer_wins_over_the_flattened_png_alongside_it() {
+        let offered = vec![
+            "text/html".to_string(),
+            "image/png".to_string(),
+            "image/gif".to_string(),
+        ];
+
+        assert_eq!(
+            choose_supported_mime(&offered).as_deref(),
+            Some("image/gif")
+        );
+    }
+
+    #[test]
+    fn png_is_still_chosen_when_no_gif_is_offered() {
+        let offered = vec!["image/jpeg".to_string(), "image/png".to_string()];
+
+        assert_eq!(
+            choose_supported_mime(&offered).as_deref(),
+            Some("image/png")
+        );
+    }
 
     #[test]
     fn image_byte_cap_leaves_room_for_default_persisted_create_history() {

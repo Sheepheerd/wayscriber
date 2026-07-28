@@ -22,6 +22,7 @@ impl ConfiguratorApp {
         let vsync_metadata = performance_field_metadata(PerformanceFieldId::EnableVsync);
         let max_fps_metadata = performance_field_metadata(PerformanceFieldId::MaxFpsNoVsync);
         let animation_metadata = performance_field_metadata(PerformanceFieldId::UiAnimationFps);
+        let animate_images_metadata = performance_field_metadata(PerformanceFieldId::AnimateImages);
         let buffer_counts = buffer_metadata
             .constraint
             .unsigned_choices()
@@ -98,7 +99,14 @@ impl ConfiguratorApp {
                         animation_range.0,
                         animation_range.1,
                     ),
-                ));
+                ))
+                .push(toggle_row(
+                    animate_images_metadata.label,
+                    self.draft.performance_animate_images,
+                    self.defaults.performance_animate_images,
+                    ToggleField::PerformanceAnimateImages,
+                ))
+                .push(text(animate_images_metadata.help).size(12));
         }
 
         scrollable(content).id(CONTENT_SCROLL_ID).into()

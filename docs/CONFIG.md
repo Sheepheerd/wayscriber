@@ -413,6 +413,10 @@ max_fps_no_vsync = 120
 # UI animation frame rate (0-240; 0 = unlimited)
 # Higher values smooth UI effects at the cost of more redraws
 ui_animation_fps = 30
+
+# Play pasted animated images (GIFs)
+# false shows the first frame instead, avoiding a canvas redraw per animation frame
+animate_images = true
 ```
 
 **Buffer Count:**
@@ -1754,8 +1758,9 @@ clear_canvas = ["X"]
 **Defaults:**
 Defaults match the original hardcoded keybindings where possible. Copy/paste selection uses
 <kbd>Ctrl+Alt+C</kbd>/<kbd>Ctrl+Alt+V</kbd>, so the clipboard-selection capture shortcut
-defaults to <kbd>Ctrl+Shift+C</kbd> to avoid conflicts. The paste action also accepts PNG/JPEG
-image data and local image files copied from a file manager.
+defaults to <kbd>Ctrl+Shift+C</kbd> to avoid conflicts. The paste action also accepts PNG/JPEG/GIF
+image data and local image files copied from a file manager. Animated GIFs play on the canvas;
+set `performance.animate_images = false` to hold their first frame instead.
 
 ## Creating Your Configuration
 

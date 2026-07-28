@@ -1,6 +1,37 @@
+use super::smoothing::append_smooth_path;
 use super::types::EraserReplayContext;
 use crate::draw::Color;
 use crate::draw::shape::{EraserBrush, EraserKind};
+use std::cell::Cell;
+
+/// Number of layered halo passes. Enough for a smooth falloff, few enough to
+/// stay cheap on strokes that can hold thousands of points.
+const GLOW_STEPS: u32 = 3;
+
+/// Widest halo, as a multiple of stroke thickness at full glow strength.
+const GLOW_MAX_SPREAD: f64 = 1.6;
+
+/// Halo alpha relative to the stroke's own alpha at full glow strength.
+const GLOW_ALPHA: f64 = 0.55;
+
+thread_local! {
+    /// Glow strength (0 = off) shared by every marker stroke on this thread.
+    ///
+    /// Held as a render setting rather than per-stroke data: it is a uniform
+    /// style choice, and keeping it out of `Shape` means changing it restyles
+    /// existing strokes instead of only newly drawn ones.
+    static MARKER_GLOW: Cell<f64> = const { Cell::new(0.0) };
+}
+
+/// Sets marker glow strength, clamped to 0.0..=1.0.
+pub fn set_marker_glow(strength: f64) {
+    MARKER_GLOW.with(|cell| cell.set(strength.clamp(0.0, 1.0)));
+}
+
+/// Current marker glow strength.
+pub fn marker_glow() -> f64 {
+    MARKER_GLOW.with(Cell::get)
+}
 
 /// Render freehand stroke (polyline through points)
 ///
@@ -107,22 +138,36 @@ pub fn render_marker_stroke_borrowed(
     // Reduce opacity to keep underlying text visible; clamp to avoid invisible strokes.
     let base_alpha = (color.a * 0.32).clamp(0.05, 0.85);
     let soft_width = (thick * 1.25).max(thick + 1.0);
+    let glow = marker_glow();
 
     let draw_pass = |ctx: &cairo::Context, width: f64, alpha: f64| {
         ctx.set_source_rgba(color.r, color.g, color.b, alpha);
         ctx.set_line_width(width);
         ctx.set_line_cap(cairo::LineCap::Round);
         ctx.set_line_join(cairo::LineJoin::Round);
-        let (x0, y0) = points[0];
-        ctx.move_to(x0 as f64, y0 as f64);
-        for &(x, y) in &points[1..] {
-            ctx.line_to(x as f64, y as f64);
-        }
+        // A curve through the samples instead of a polyline: pointer positions
+        // are integers, so straight segments between them facet visibly at
+        // marker widths.
+        append_smooth_path(ctx, points);
         let _ = ctx.stroke();
     };
 
     ctx.save().ok();
+    // Wide translucent edges are where stair-stepping shows most, so ask for
+    // the best coverage cairo will compute rather than the default.
+    ctx.set_antialias(cairo::Antialias::Best);
     ctx.set_operator(cairo::Operator::Screen);
+    if glow > 0.0 {
+        // Halo pass: widest and faintest, layered under the stroke so the ink
+        // bleeds outward the way wet highlighter does on paper. Stepped so the
+        // falloff reads as a gradient rather than one hard band.
+        for step in (1..=GLOW_STEPS).rev() {
+            let spread = step as f64 / GLOW_STEPS as f64;
+            let width = soft_width + thick * GLOW_MAX_SPREAD * glow * spread;
+            let alpha = base_alpha * GLOW_ALPHA * glow / (step as f64);
+            draw_pass(ctx, width, alpha);
+        }
+    }
     // Soft outer pass for feathered edges
     draw_pass(ctx, soft_width, base_alpha * 0.7);
     // Core pass for body of the marker

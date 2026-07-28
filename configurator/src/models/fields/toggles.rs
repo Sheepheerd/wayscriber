@@ -3,6 +3,7 @@ pub enum ToggleField {
     DrawingTextBackground,
     DrawingFillEnabled,
     PerformanceVsync,
+    PerformanceAnimateImages,
     UiShowStatusBar,
     UiStatusBarInteractive,
     UiActiveOutputBadge,

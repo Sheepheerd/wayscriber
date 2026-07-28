@@ -13,6 +13,7 @@ use crate::config::{
 use crate::draw::{
     BlurStyle, DirtyTracker, EraserKind, FontDescriptor, REGULAR_POLYGON_DEFAULT_SIDES,
 };
+use crate::input::state::core::animated_images::AnimatedImagePlayback;
 use crate::input::state::highlight::{ClickHighlightSettings, ClickHighlightState};
 use crate::input::state::input_hud::{InputHudSettings, InputHudState};
 use crate::input::{
@@ -223,6 +224,8 @@ impl InputState {
             pending_text_paste: Default::default(),
             max_shapes_per_frame,
             click_highlight: ClickHighlightState::new(click_highlight_settings),
+            animated_images: AnimatedImagePlayback::default(),
+            animated_images_enabled: true,
             input_hud: InputHudState::new(InputHudSettings::default()),
             tool_override: None,
             selection_state: SelectionState::None,

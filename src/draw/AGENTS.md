@@ -8,10 +8,12 @@
 - `frame/` owns frame storage, serialization, and undo/redo history.
 - `shape/` owns shape types, bounds, text cache, polygons, step markers, and labels.
 - `render/` owns Cairo/Pango rendering helpers.
+- `render/image/` owns the decoded-image surface cache and animation playback; `render/image/animation.rs` holds the thread-local playhead that decides which frame of an animated image renders.
 
 ## Invariants
 - Keep this area mostly pure; rendering helpers should not mutate application state except intentional caches or Cairo surface/path operations.
 - Preserve serialization compatibility, undo/history invariants, canvas/page identity, and Cairo path isolation.
+- Set the animation playhead once per render pass, never per shape: every animated image in a pass must agree on the time, and exports must capture the frame that was last on screen.
 
 ## Coupled Changes
 - Drawing changes may affect input tools, selection behavior, canvas export, session snapshots, toolbar controls, config defaults, and tests.

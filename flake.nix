@@ -4,15 +4,32 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
+
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
       let
-        pkgs = import nixpkgs { inherit system; };
+        pkgs = import nixpkgs {
+          inherit system;
+          config = {
+            allowUnfree = true;
+          };
+        };
         version = (builtins.fromTOML (builtins.readFile ./Cargo.toml)).package.version;
-        servicePath = pkgs.lib.makeBinPath [ pkgs.grim pkgs.slurp pkgs.wl-clipboard ];
-      in {
+        servicePath = pkgs.lib.makeBinPath [
+          pkgs.grim
+          pkgs.slurp
+          pkgs.wl-clipboard
+        ];
+      in
+      {
         packages = {
           wayscriber = pkgs.rustPlatform.buildRustPackage {
             pname = "wayscriber";
@@ -76,7 +93,10 @@
             cargoLock.lockFile = ./Cargo.lock;
             buildAndTestSubdir = "configurator";
 
-            nativeBuildInputs = with pkgs; [ pkg-config makeWrapper ];
+            nativeBuildInputs = with pkgs; [
+              pkg-config
+              makeWrapper
+            ];
 
             # Iced GUI toolkit dependencies
             buildInputs = with pkgs; [
@@ -104,12 +124,14 @@
 
               # Wrap binary to find GL/Vulkan libraries at runtime (Iced uses dlopen)
               wrapProgram $out/bin/wayscriber-configurator \
-                --prefix LD_LIBRARY_PATH : ${pkgs.lib.makeLibraryPath [
-                  pkgs.vulkan-loader
-                  pkgs.libGL
-                  pkgs.wayland
-                  pkgs.libxkbcommon
-                ]}
+                --prefix LD_LIBRARY_PATH : ${
+                  pkgs.lib.makeLibraryPath [
+                    pkgs.vulkan-loader
+                    pkgs.libGL
+                    pkgs.wayland
+                    pkgs.libxkbcommon
+                  ]
+                }
             '';
 
             meta = with pkgs.lib; {
@@ -142,5 +164,6 @@
             libGL
           ];
         };
-      });
+      }
+    );
 }

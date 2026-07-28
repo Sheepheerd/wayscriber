@@ -35,6 +35,7 @@ use crate::input::BoardManager;
 use crate::input::boards::{
     BoardRestoreRequest, PageRestoreRequest, PendingBoardConfigUpdate, PendingBoardRuntimeUiAction,
 };
+use crate::input::state::core::animated_images::AnimatedImagePlayback;
 use crate::input::state::highlight::ClickHighlightState;
 use crate::input::state::input_hud::InputHudState;
 use crate::input::{
@@ -423,6 +424,10 @@ pub struct InputState {
     pub max_shapes_per_frame: usize,
     /// Click highlight animation state
     pub(crate) click_highlight: ClickHighlightState,
+    /// Playback scheduling for animated image shapes (pasted GIFs)
+    pub(crate) animated_images: AnimatedImagePlayback,
+    /// Whether animated images play; when false they show their first frame
+    pub(crate) animated_images_enabled: bool,
     /// On-screen input HUD (keystroke/click chips) state
     pub(crate) input_hud: InputHudState,
     /// Optional tool override independent of modifier keys

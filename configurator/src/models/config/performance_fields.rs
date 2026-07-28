@@ -48,6 +48,7 @@ impl ConfigDraft {
     pub(super) fn set_performance_bool(&mut self, id: PerformanceFieldId, value: bool) {
         match id {
             PerformanceFieldId::EnableVsync => self.performance_enable_vsync = value,
+            PerformanceFieldId::AnimateImages => self.performance_animate_images = value,
             PerformanceFieldId::BufferCount
             | PerformanceFieldId::MaxFpsNoVsync
             | PerformanceFieldId::UiAnimationFps => {
@@ -60,7 +61,9 @@ impl ConfigDraft {
         match id {
             PerformanceFieldId::MaxFpsNoVsync => self.performance_max_fps_no_vsync = value,
             PerformanceFieldId::UiAnimationFps => self.performance_ui_animation_fps = value,
-            PerformanceFieldId::BufferCount | PerformanceFieldId::EnableVsync => {
+            PerformanceFieldId::BufferCount
+            | PerformanceFieldId::EnableVsync
+            | PerformanceFieldId::AnimateImages => {
                 unreachable!("non-text Performance field routed through text setter")
             }
         }
@@ -71,7 +74,8 @@ impl ConfigDraft {
             PerformanceFieldId::BufferCount => self.performance_buffer_count = value,
             PerformanceFieldId::EnableVsync
             | PerformanceFieldId::MaxFpsNoVsync
-            | PerformanceFieldId::UiAnimationFps => {
+            | PerformanceFieldId::UiAnimationFps
+            | PerformanceFieldId::AnimateImages => {
                 unreachable!("non-choice Performance field routed through choice setter")
             }
         }

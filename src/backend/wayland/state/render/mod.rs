@@ -62,6 +62,14 @@ impl WaylandState {
                 self.input_state.advance_input_hud(now),
             )
         });
+        // Positions the shared playhead and damages images whose frame changed.
+        // Runs before dirty collection below so this pass paints the new frames.
+        // Deliberately excluded from `ui_animation_active`: animated images carry
+        // their own per-frame deadline, while the UI tick fires at
+        // `ui_animation_fps` no matter how slow the animation actually is.
+        record_stage!(advance_animations, {
+            self.input_state.advance_animated_images(now)
+        });
         let ui_animation_active = highlight_active
             || preset_feedback_active
             || ui_toast_active

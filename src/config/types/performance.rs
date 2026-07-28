@@ -29,6 +29,12 @@ pub struct PerformanceConfig {
     /// Higher values make UI effects smoother at the cost of more redraws.
     #[serde(default = "default_ui_animation_fps")]
     pub ui_animation_fps: u32,
+
+    /// Play pasted animated images (GIFs) instead of showing their first frame.
+    /// Playback redraws the canvas region on every frame of the animation, so
+    /// turn it off when presenting on a machine where that cost matters.
+    #[serde(default = "default_animate_images")]
+    pub animate_images: bool,
 }
 
 impl Default for PerformanceConfig {
@@ -38,6 +44,7 @@ impl Default for PerformanceConfig {
             enable_vsync: default_enable_vsync(),
             max_fps_no_vsync: default_max_fps_no_vsync(),
             ui_animation_fps: default_ui_animation_fps(),
+            animate_images: default_animate_images(),
         }
     }
 }
@@ -56,4 +63,8 @@ fn default_max_fps_no_vsync() -> u32 {
 
 fn default_ui_animation_fps() -> u32 {
     30
+}
+
+fn default_animate_images() -> bool {
+    true
 }

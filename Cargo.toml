@@ -44,6 +44,8 @@ schemars = { version = "1.2", features = ["derive"], optional = true }
 libc = "0.2"
 flate2 = "1.0"
 zune-jpeg = "0.5"
+# Animated clipboard images. GIF is LZW-compressed, so `flate2` cannot decode it.
+gif = { version = "0.13", default-features = false, features = ["std", "raii_no_panic"] }
 # Grapheme/word segmentation for the text-editor caret and selection.
 unicode-segmentation = "1"
 

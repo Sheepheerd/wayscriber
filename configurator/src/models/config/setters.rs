@@ -158,6 +158,9 @@ impl ConfigDraft {
             ToggleField::PerformanceVsync => {
                 self.set_performance_bool(PerformanceFieldId::EnableVsync, value);
             }
+            ToggleField::PerformanceAnimateImages => {
+                self.set_performance_bool(PerformanceFieldId::AnimateImages, value);
+            }
             ToggleField::UiShowStatusBar => self.ui_show_status_bar = value,
             ToggleField::UiStatusBarInteractive => self.ui_status_bar_interactive = value,
             ToggleField::UiActiveOutputBadge => self.ui_active_output_badge = value,
