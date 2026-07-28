@@ -195,6 +195,7 @@ fn image_frame(bytes: usize) -> crate::draw::Frame {
             height: 360,
             bytes: pseudo_random_bytes(bytes),
         },
+        corner_radius: 0.0,
     });
     frame
 }
@@ -619,6 +620,7 @@ fn save_snapshot_keeps_depth_one_when_visible_payload_is_near_limit() {
                 height: 360,
                 bytes: vec![0x35; 96 * 1024],
             },
+            corner_radius: 0.0,
         });
         let id = frame.add_shape(large_freehand(40, 0));
         for offset in 1..=2 {
@@ -746,6 +748,7 @@ fn add_image_and_annotations(frame: &mut crate::draw::Frame, page_index: usize, 
             height: 360,
             bytes: vec![0x5a; bytes],
         },
+        corner_radius: 0.0,
     });
     let (image_index, image_shape) = frame
         .find_index(image_id)

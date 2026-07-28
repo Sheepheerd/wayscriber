@@ -282,6 +282,7 @@ fn image_bounding_box_and_kind_name_use_display_bounds() {
             height: 1,
             bytes: vec![1, 2, 3],
         },
+        corner_radius: 0.0,
     };
 
     let rect = shape.bounding_box().expect("image should have bounds");
@@ -302,6 +303,7 @@ fn image_serialization_uses_base64_bytes() {
             height: 4,
             bytes: vec![1, 2, 3, 4],
         },
+        corner_radius: 0.0,
     };
 
     let json = serde_json::to_string(&shape).expect("serialize image shape");

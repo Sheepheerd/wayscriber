@@ -46,6 +46,19 @@ pub struct DrawingConfig {
     #[serde(default = "default_marker_opacity")]
     pub marker_opacity: f64,
 
+    /// Soft halo around marker strokes (0.0 - 1.0; 0 disables it).
+    /// Higher values bleed the ink further out, like a wet highlighter.
+    /// Unlike `marker_opacity` this is a render setting, so changing it
+    /// restyles existing strokes rather than only newly drawn ones.
+    #[serde(default = "default_marker_glow")]
+    pub marker_glow: f64,
+
+    /// Corner radius in pixels applied to newly pasted images (0 = square).
+    /// Existing images keep their own radius; adjust it from the selection
+    /// properties panel.
+    #[serde(default = "default_image_corner_radius")]
+    pub image_corner_radius: f64,
+
     /// Whether shapes start filled when applicable
     #[serde(default = "default_fill_enabled")]
     pub default_fill_enabled: bool,
@@ -127,6 +140,8 @@ impl Default for DrawingConfig {
             default_eraser_mode: default_eraser_mode(),
             default_blur_style: default_blur_style(),
             marker_opacity: default_marker_opacity(),
+            marker_glow: default_marker_glow(),
+            image_corner_radius: default_image_corner_radius(),
             default_fill_enabled: default_fill_enabled(),
             polygon_sides: default_polygon_sides(),
             default_font_size: default_font_size(),
@@ -867,6 +882,14 @@ fn default_blur_style() -> BlurStyle {
 
 fn default_marker_opacity() -> f64 {
     0.32
+}
+
+fn default_marker_glow() -> f64 {
+    0.0
+}
+
+fn default_image_corner_radius() -> f64 {
+    0.0
 }
 
 fn default_fill_enabled() -> bool {

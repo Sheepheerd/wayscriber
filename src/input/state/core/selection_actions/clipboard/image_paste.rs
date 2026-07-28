@@ -55,6 +55,7 @@ impl InputState {
             w,
             h,
             data: image,
+            corner_radius: self.image_corner_radius,
         };
         let Some(new_id) = frame.try_add_shape_with_id(shape, max_shapes) else {
             log::warn!(

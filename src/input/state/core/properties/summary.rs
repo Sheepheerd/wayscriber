@@ -97,6 +97,13 @@ pub(super) fn shape_thickness(shape: &Shape) -> Option<f64> {
     }
 }
 
+pub(super) fn shape_corner_radius(shape: &Shape) -> Option<f64> {
+    match shape {
+        Shape::Image { corner_radius, .. } => Some(*corner_radius),
+        _ => None,
+    }
+}
+
 pub(super) fn shape_fill(shape: &Shape) -> Option<bool> {
     match shape {
         Shape::Rect { fill, .. } | Shape::Ellipse { fill, .. } | Shape::Polygon { fill, .. } => {

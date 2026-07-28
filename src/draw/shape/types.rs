@@ -327,6 +327,12 @@ pub enum Shape {
         h: i32,
         /// Original encoded image payload and natural dimensions
         data: EmbeddedImage,
+        /// Corner rounding in logical pixels (0 = square corners).
+        ///
+        /// Defaulted on load so images saved before rounding existed keep their
+        /// square corners.
+        #[serde(default)]
+        corner_radius: f64,
     },
 }
 

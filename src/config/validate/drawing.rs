@@ -44,6 +44,26 @@ impl Config {
             self.drawing.marker_opacity = self.drawing.marker_opacity.clamp(0.05, 0.9);
         }
 
+        // Marker glow: 0.0 - 1.0, where 0 disables the halo entirely.
+        if !(0.0..=1.0).contains(&self.drawing.marker_glow) {
+            log::warn!(
+                "Invalid marker_glow {:.2}, clamping to 0.00-1.00 range",
+                self.drawing.marker_glow
+            );
+            self.drawing.marker_glow = self.drawing.marker_glow.clamp(0.0, 1.0);
+        }
+
+        // Image corner radius: no upper bound is meaningful here because the
+        // renderer clamps per image to half its shorter side; only reject
+        // negatives and non-finite values.
+        if !self.drawing.image_corner_radius.is_finite() || self.drawing.image_corner_radius < 0.0 {
+            log::warn!(
+                "Invalid image_corner_radius {:.1}, falling back to 0",
+                self.drawing.image_corner_radius
+            );
+            self.drawing.image_corner_radius = 0.0;
+        }
+
         // Font size: 8.0 - 72.0
         if !(8.0..=72.0).contains(&self.drawing.default_font_size) {
             log::warn!(

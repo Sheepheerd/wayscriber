@@ -226,6 +226,7 @@ impl InputState {
             click_highlight: ClickHighlightState::new(click_highlight_settings),
             animated_images: AnimatedImagePlayback::default(),
             animated_images_enabled: true,
+            image_corner_radius: 0.0,
             input_hud: InputHudState::new(InputHudSettings::default()),
             tool_override: None,
             selection_state: SelectionState::None,

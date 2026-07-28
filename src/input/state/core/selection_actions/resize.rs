@@ -244,16 +244,28 @@ impl InputState {
                     style: *style,
                 }
             }
-            Shape::Image { x, y, w, h, data } => {
+            Shape::Image {
+                x,
+                y,
+                w,
+                h,
+                data,
+                corner_radius,
+            } => {
                 let (nx, ny) = Self::scale_point_i32(*x, *y, anchor_x, anchor_y, scale_x, scale_y);
                 let nw = Self::scale_size(*w, scale_x);
                 let nh = Self::scale_size(*h, scale_y);
+                // Scale the radius with the image so the corner keeps its
+                // proportions; use the gentler axis so a lopsided resize cannot
+                // round the corners past what the shorter side can show.
+                let radius_scale = scale_x.abs().min(scale_y.abs());
                 Shape::Image {
                     x: nx,
                     y: ny,
                     w: nw.max(1),
                     h: nh.max(1),
                     data: data.clone(),
+                    corner_radius: (corner_radius * radius_scale).max(0.0),
                 }
             }
             Shape::Freehand {

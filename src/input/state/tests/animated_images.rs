@@ -35,6 +35,7 @@ fn add_image(state: &mut InputState, mime_type: &str, bytes: Vec<u8>) -> crate::
             height: 1,
             bytes,
         },
+        corner_radius: 0.0,
     })
 }
 

@@ -486,6 +486,7 @@ fn add_active_image_shape(state: &mut InputState, bytes: usize) -> ShapeId {
             height: 180,
             bytes: pseudo_random_bytes(bytes),
         },
+        corner_radius: 0.0,
     })
 }
 

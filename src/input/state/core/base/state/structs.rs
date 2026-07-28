@@ -428,6 +428,8 @@ pub struct InputState {
     pub(crate) animated_images: AnimatedImagePlayback,
     /// Whether animated images play; when false they show their first frame
     pub(crate) animated_images_enabled: bool,
+    /// Corner radius applied to newly pasted images, in logical pixels
+    pub(crate) image_corner_radius: f64,
     /// On-screen input HUD (keystroke/click chips) state
     pub(crate) input_hud: InputHudState,
     /// Optional tool override independent of modifier keys

@@ -274,8 +274,15 @@ pub fn render_shape(ctx: &cairo::Context, shape: &Shape) {
         Shape::EraserStroke { .. } => {
             // Eraser strokes require an eraser replay context; ignore in generic rendering.
         }
-        Shape::Image { x, y, w, h, data } => {
-            render_image_shape(ctx, *x, *y, *w, *h, data);
+        Shape::Image {
+            x,
+            y,
+            w,
+            h,
+            data,
+            corner_radius,
+        } => {
+            render_image_shape(ctx, *x, *y, *w, *h, data, *corner_radius);
         }
     }
 }

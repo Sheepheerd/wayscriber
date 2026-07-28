@@ -153,6 +153,7 @@ pub(crate) const fn selection_kind_slug(kind: SelectionPropertyKind) -> &'static
         SelectionPropertyKind::ArrowLength => "arrow-length",
         SelectionPropertyKind::ArrowAngle => "arrow-angle",
         SelectionPropertyKind::TextBackground => "text-background",
+        SelectionPropertyKind::CornerRadius => "corner-radius",
     }
 }
 
@@ -167,7 +168,8 @@ pub(crate) const fn selection_control_for_kind(kind: SelectionPropertyKind) -> S
         SelectionPropertyKind::Thickness
         | SelectionPropertyKind::FontSize
         | SelectionPropertyKind::ArrowLength
-        | SelectionPropertyKind::ArrowAngle => StylePillControl::SelectionStepper(kind),
+        | SelectionPropertyKind::ArrowAngle
+        | SelectionPropertyKind::CornerRadius => StylePillControl::SelectionStepper(kind),
     }
 }
 
@@ -595,7 +597,18 @@ impl StylePillControl {
                 "top.style.sel.arrow-angle.minus",
                 "top.style.sel.arrow-angle.plus",
             ),
-            _ => return None,
+            SelectionPropertyKind::CornerRadius => (
+                "top.style.sel.corner-radius.minus",
+                "top.style.sel.corner-radius.plus",
+            ),
+            // Cycle controls have no minus/plus halves. Listed explicitly rather
+            // than caught by a wildcard: the top bar `expect`s a stepper to
+            // produce ids, so a new stepper kind must fail to compile here
+            // instead of panicking at paint time.
+            SelectionPropertyKind::Color
+            | SelectionPropertyKind::Fill
+            | SelectionPropertyKind::ArrowHead
+            | SelectionPropertyKind::TextBackground => return None,
         };
         Some([
             StylePillStep {
@@ -1097,6 +1110,47 @@ mod tests {
             ),
         ];
         snapshot
+    }
+
+    #[test]
+    fn every_stepper_kind_supplies_both_halves() {
+        // The top bar `expect`s a stepper to produce its minus/plus ids, so a
+        // kind classified as a stepper without matching ids panics at paint
+        // time rather than failing to build. Cover all kinds so adding one
+        // cannot reintroduce that.
+        for kind in SelectionPropertyKind::ALL {
+            let mut snapshot = snapshot_for_tool(Tool::Select);
+            snapshot.selection_properties = vec![selection_entry("Property", "Value", kind, false)];
+
+            let control = selection_control_for_kind(kind);
+            let steps = control.steps(&snapshot);
+
+            match control {
+                StylePillControl::SelectionStepper(_) => {
+                    let steps =
+                        steps.unwrap_or_else(|| panic!("{kind:?} is a stepper without halves"));
+                    assert_ne!(steps[0].id, steps[1].id, "{kind:?} halves share an id");
+                    assert!(
+                        steps[0].id.contains(selection_kind_slug(kind)),
+                        "{kind:?} half id does not name its property"
+                    );
+                }
+                _ => assert!(steps.is_none(), "{kind:?} is not a stepper but has halves"),
+            }
+        }
+    }
+
+    #[test]
+    fn every_kind_has_a_distinct_slug() {
+        let mut slugs: Vec<&str> = SelectionPropertyKind::ALL
+            .iter()
+            .map(|kind| selection_kind_slug(*kind))
+            .collect();
+        slugs.sort_unstable();
+        let count = slugs.len();
+        slugs.dedup();
+
+        assert_eq!(slugs.len(), count, "selection property slugs collide");
     }
 
     #[test]

@@ -309,6 +309,7 @@ fn image_hit_test_uses_display_rectangle() {
                 height: 3,
                 bytes: vec![1, 2, 3],
             },
+            corner_radius: 0.0,
         },
         0,
         false,

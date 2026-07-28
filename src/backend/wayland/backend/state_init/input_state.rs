@@ -75,6 +75,10 @@ pub(super) fn build_input_state(config: &Config) -> InputState {
     input_state.command_palette_toast_duration_ms = config.ui.command_palette_toast_duration_ms;
     input_state.radial_menu_mouse_binding = config.ui.radial_menu_mouse_binding;
     input_state.animated_images_enabled = config.performance.animate_images;
+    input_state.image_corner_radius = config.drawing.image_corner_radius;
+    // Render-side style, not per-shape data, so it applies to strokes that were
+    // restored from a session as well as new ones.
+    crate::draw::render::set_marker_glow(config.drawing.marker_glow);
     #[cfg(feature = "tablet-input")]
     {
         input_state.pressure_variation_threshold = config.tablet.pressure_variation_threshold;

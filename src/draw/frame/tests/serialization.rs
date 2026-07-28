@@ -138,6 +138,7 @@ fn image_bounds_history_serializes_without_duplicate_image_payloads() {
             height: 16,
             bytes,
         },
+        corner_radius: 0.0,
     });
     let index = frame.find_index(id).unwrap();
     frame.push_undo_action(

@@ -1,7 +1,7 @@
 use super::super::base::InputState;
 use super::summary::{
-    shape_arrow_angle, shape_arrow_head, shape_arrow_length, shape_color, shape_fill,
-    shape_font_size, shape_text_background, shape_thickness, summarize_property,
+    shape_arrow_angle, shape_arrow_head, shape_arrow_length, shape_color, shape_corner_radius,
+    shape_fill, shape_font_size, shape_text_background, shape_thickness, summarize_property,
 };
 use super::types::{SelectionPropertyEntry, SelectionPropertyKind};
 use super::utils::{approx_eq, color_eq, color_label};
@@ -192,6 +192,32 @@ impl InputState {
                 value,
                 kind: SelectionPropertyKind::ArrowAngle,
                 disabled: !angle_summary.editable,
+            });
+        }
+
+        let corner_summary = summarize_property(frame, ids, shape_corner_radius, approx_eq);
+        if corner_summary.applicable {
+            let value = if !corner_summary.editable {
+                "Locked".to_string()
+            } else if corner_summary.mixed {
+                "Mixed".to_string()
+            } else {
+                corner_summary
+                    .value
+                    .map(|v| {
+                        if v <= 0.0 {
+                            "Square".to_string()
+                        } else {
+                            format!("{v:.0}px")
+                        }
+                    })
+                    .unwrap_or_else(|| "Mixed".to_string())
+            };
+            entries.push(SelectionPropertyEntry {
+                label: "Corner radius".to_string(),
+                value,
+                kind: SelectionPropertyKind::CornerRadius,
+                disabled: !corner_summary.editable,
             });
         }
 

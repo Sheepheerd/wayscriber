@@ -10,6 +10,22 @@ pub enum SelectionPropertyKind {
     ArrowLength,
     ArrowAngle,
     TextBackground,
+    CornerRadius,
+}
+
+impl SelectionPropertyKind {
+    /// Every kind, for exhaustiveness checks in tests.
+    pub const ALL: [Self; 9] = [
+        Self::Color,
+        Self::Thickness,
+        Self::Fill,
+        Self::FontSize,
+        Self::ArrowHead,
+        Self::ArrowLength,
+        Self::ArrowAngle,
+        Self::TextBackground,
+        Self::CornerRadius,
+    ];
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

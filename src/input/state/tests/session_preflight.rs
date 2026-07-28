@@ -71,6 +71,7 @@ fn add_active_image_shape(state: &mut InputState) -> ShapeId {
             height: 180,
             bytes: Vec::new(),
         },
+        corner_radius: 0.0,
     })
 }
 

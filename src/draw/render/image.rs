@@ -52,6 +52,43 @@ impl CachedImage {
     }
 }
 
+/// Adds a rounded rectangle to the current path, falling back to a plain
+/// rectangle when there is nothing to round.
+///
+/// The radius is clamped to half the shorter side, which is the point where
+/// opposite corner arcs meet: beyond it the outline would self-intersect.
+/// Clamping rather than rejecting means an oversized radius reads as a
+/// pill/circle, which is what someone dragging the value up expects.
+fn append_rounded_rect(ctx: &cairo::Context, x: f64, y: f64, width: f64, height: f64, radius: f64) {
+    let radius = clamp_corner_radius(radius, width, height);
+    if radius <= 0.0 {
+        ctx.rectangle(x, y, width, height);
+        return;
+    }
+
+    use std::f64::consts::{FRAC_PI_2, PI};
+    ctx.new_sub_path();
+    ctx.arc(x + width - radius, y + radius, radius, -FRAC_PI_2, 0.0);
+    ctx.arc(
+        x + width - radius,
+        y + height - radius,
+        radius,
+        0.0,
+        FRAC_PI_2,
+    );
+    ctx.arc(x + radius, y + height - radius, radius, FRAC_PI_2, PI);
+    ctx.arc(x + radius, y + radius, radius, PI, PI + FRAC_PI_2);
+    ctx.close_path();
+}
+
+/// Largest radius that renders sensibly for a box of this size.
+pub fn clamp_corner_radius(radius: f64, width: f64, height: f64) -> f64 {
+    if !radius.is_finite() || radius <= 0.0 {
+        return 0.0;
+    }
+    radius.min(width.abs().min(height.abs()) / 2.0)
+}
+
 fn surface_bytes(surface: &ImageSurface) -> usize {
     (surface.stride().max(0) as usize).saturating_mul(surface.height().max(0) as usize)
 }
@@ -111,6 +148,7 @@ pub fn render_image_shape(
     w: i32,
     h: i32,
     data: &EmbeddedImage,
+    corner_radius: f64,
 ) {
     if w == 0 || h == 0 {
         return;
@@ -126,7 +164,17 @@ pub fn render_image_shape(
     let draw_y = if h < 0 { y + h } else { y };
 
     let _ = ctx.save();
-    ctx.rectangle(draw_x as f64, draw_y as f64, width, height);
+    // Rounded corners come from the clip path, so they apply to the pixels
+    // themselves rather than being drawn over them; the image stays intact and
+    // the corners are genuinely transparent.
+    append_rounded_rect(
+        ctx,
+        draw_x as f64,
+        draw_y as f64,
+        width,
+        height,
+        corner_radius,
+    );
     ctx.clip();
     ctx.translate(draw_x as f64, draw_y as f64);
     ctx.scale(

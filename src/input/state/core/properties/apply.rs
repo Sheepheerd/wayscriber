@@ -88,6 +88,9 @@ impl InputState {
             SelectionPropertyKind::TextBackground => {
                 self.apply_selection_text_background(direction)
             }
+            SelectionPropertyKind::CornerRadius => {
+                self.apply_selection_corner_radius(direction_or_default(direction))
+            }
         }
     }
 }
